@@ -58,13 +58,15 @@ class PolicyWithMotion(nn.Module):
         return a, self.q[f], self.qd[f], self.body_p[f], self.body_quat[f], self.body_v[f], self.body_w[f], self.body_quat[f1, 0]
 
 
-def pd_gains(robot: RobotSpec) -> tuple[list[float], list[float]]:
+def joint_actuators(robot: RobotSpec) -> list:
+    """Actuator config driving each joint, in `robot.joint_names` order."""
     acts = robot.robot_cfg().articulation.actuators
-    kp, kd = [], []
-    for n in robot.joint_names:
-        act = next(a for a in acts if any(re.fullmatch(p, n) for p in a.target_names_expr))
-        kp.append(act.stiffness), kd.append(act.damping)
-    return kp, kd
+    return [next(a for a in acts if any(re.fullmatch(p, n) for p in a.target_names_expr)) for n in robot.joint_names]
+
+
+def pd_gains(robot: RobotSpec) -> tuple[list[float], list[float]]:
+    acts = joint_actuators(robot)
+    return [a.stiffness for a in acts], [a.damping for a in acts]
 
 
 def main():
@@ -92,7 +94,9 @@ def main():
     torch.onnx.export(model, (obs, t), a.out, input_names=["obs_history", "time_step"], output_names=OUTPUTS,
                       opset_version=18, dynamo=False)  # fmt: skip
 
-    kp, kd = pd_gains(robot)
+    acts = joint_actuators(robot)
+    kp = [a.stiffness for a in acts]
+    kd = [a.damping for a in acts]
     fmt = lambda xs: ",".join(f"{float(x):.6g}" for x in xs)  # noqa: E731
     meta = {
         "run_path": os.path.abspath(a.ckpt),
@@ -101,6 +105,8 @@ def main():
         "joint_names": ",".join(robot.joint_names),
         "joint_stiffness": fmt(kp),
         "joint_damping": fmt(kd),
+        "joint_armature": fmt([a.armature for a in acts]),
+        "joint_effort_limit": fmt([a.effort_limit for a in acts]),
         "default_joint_pos": fmt(robot.default_joint_pos_list()),
         "action_scale": fmt(robot.action_scale_list()),
         "command_names": "motion",
