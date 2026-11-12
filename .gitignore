@@ -15,6 +15,19 @@ logs/
 results/analysis/
 # third-party paper
 *.pdf
-# virtual environment
-.venv/
+# virtual environments (any suffix: .venv-local, .venv-ort, .venv-plot, ...)
+.venv*/
+# agent scratch: ssh config, helper scripts, local caches
+.dsh-ssh/
+# local run outputs kept next to the repo
+my_run/
 /data
+
+# docker build output
+dist/
+
+# local secrets
+.env*
+
+# MuJoCo crash log
+MUJOCO_LOG.TXT
