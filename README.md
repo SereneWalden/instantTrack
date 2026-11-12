@@ -598,6 +598,7 @@ git clone https://github.com/Huy-Quang-Dao/instantTrack.git
 cd instantTrack
 uv sync                          # creates .venv: mjlab, MuJoCo Warp, Warp, torch 2.9.0 (CUDA 12.8)
 tools/download_data.sh           # LAFAN1 G1 retargets (40 clips) + G1 description -> data/, builds data/g1_description/g1_29dof.xml
+uv run python tools/urdf_to_mjcf.py
 uv run python tools/test_env.py  # sanity check: FK vs simulator (~1e-6), state round-trip, reference playback
 ```
 

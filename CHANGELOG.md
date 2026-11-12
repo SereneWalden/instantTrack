@@ -6,6 +6,14 @@ All notable changes to InstantTrack are documented here. The format follows
 with the protocol in the README ("Time to target"); every number below can be regenerated from
 `results/runs/` with `tools/make_report.py`.
 
+## 2026-11-12 Cathy first deployment
+
+### Changed
+- 换了国内源以加速uv sync等
+- 把uv run python tools/urdf_to_mjcf.py从download_data.sh里拆出来，这样download_data不依赖uv
+- 增加了连接CompShare服务器的代码
+- 增加了在本地mujoco运行policy的代码，本地只需要mujoco和onnxruntime，不需要cuda等
+
 ## [Unreleased]
 
 ## [1.4.0] - 2026-11-07
