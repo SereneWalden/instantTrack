@@ -23,10 +23,21 @@ required-environments = ["sys_platform == 'linux' and platform_machine == 'x86_6
 # CUDA 12.8 torch (Blackwell-capable); pinned to versions tested with this code.
 constraint-dependencies = ["torch==2.9.0", "warp-lang==1.16.0"]
 
+# Aliyun mirrors (measured from a CompShare GPU container: 15.8 MB/s vs 0.43 MB/s for pypi.org).
+# `default = true` removes PyPI as the default index, so every package except torch resolves here.
+# See "Setup" in README.md before changing this.
 [[tool.uv.index]]
-name = "pytorch-cu128"
-url = "https://download.pytorch.org/whl/cu128"
+name = "aliyun-pypi"
+url = "https://mirrors.aliyun.com/pypi/simple"
+default = true
+
+# CUDA 12.8 torch wheels. mirrors.aliyun.com/pytorch-wheels/cu128/ is a *flat* Apache directory
+# listing, not a PEP 503 simple index (.../cu128/torch/ returns 404), so format = "flat" is required.
+[[tool.uv.index]]
+name = "pytorch-cu128-aliyun"
+url = "https://mirrors.aliyun.com/pytorch-wheels/cu128/"
+format = "flat"
 explicit = true
 
 [tool.uv.sources]
-torch = { index = "pytorch-cu128" }
+torch = { index = "pytorch-cu128-aliyun" }
